@@ -5,6 +5,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Shark extends Creature {
+    public boolean debug;
+
     public Shark(Random random, World.Position position) {
         super(random, position, 11, 0);
     }
@@ -12,8 +14,9 @@ public class Shark extends Creature {
     @Override
     public void updateState(State state) {
         if (energy <= MIN_ENERGY) {
-            state.setAtPosition(position, State.GridCell.OCEAN);
-            state.creatures().remove(this);
+//            state.setAtPosition(position, null);
+//            dead = true;
+            state.removeCreature(this);
             return;
         }
 
@@ -28,19 +31,22 @@ public class Shark extends Creature {
         }
 
 
-        if (possibleTransitions.size() > 0) {
+        if (!possibleTransitions.isEmpty()) {
             newPosition = possibleTransitions.get(random.nextInt(possibleTransitions.size()));
         }
 
-        state.setAtPosition(newPosition, State.GridCell.SHARK);
+        this.debug = newPosition.equals(position);
+        state.setAtPosition(newPosition, this);
 
         libido++;
-        if (libido >= MAX_LIBIDO && !position.equals(newPosition)) {
-            libido = 0;
-            var child = new Shark(random, position);
-            state.creatures().add(child);
-        } else {
-            state.setAtPosition(position, State.GridCell.OCEAN);
+        if (!position.equals(newPosition)) {
+            if (libido >= MAX_LIBIDO) {
+                libido = 0;
+                var child = new Shark(random, position);
+                state.addCreature(child);
+            } else {
+                state.setAtPosition(position, null);
+            }
         }
 
         position = newPosition;

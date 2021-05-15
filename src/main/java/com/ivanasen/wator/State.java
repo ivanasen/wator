@@ -1,9 +1,6 @@
 package com.ivanasen.wator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class State {
     public enum GridCell {
@@ -15,54 +12,55 @@ public class State {
             throw new IllegalArgumentException("World size must be positive");
         }
 
-        var grid = new GridCell[height][width];
-        Arrays.stream(grid).forEach(row -> Arrays.fill(row, GridCell.OCEAN));
-        var creatures = new ArrayList<Creature>();
-
-        Runnable spawnFish = () -> {
-            while (true) {
-                int row = random.nextInt(height);
-                int col = random.nextInt(width);
-                if (grid[row][col] != GridCell.OCEAN) {
-                    continue;
-                }
-
-                grid[row][col] = GridCell.FISH;
-                creatures.add(new Fish(random, new World.Position(row, col)));
-                break;
-            }
-        };
-
-        Runnable spawnShark = () -> {
-            while (true) {
-                int row = random.nextInt(height);
-                int col = random.nextInt(width);
-                if (grid[row][col] != GridCell.OCEAN) {
-                    continue;
-                }
-
-                grid[row][col] = GridCell.SHARK;
-                creatures.add(new Shark(random, new World.Position(row, col)));
-                break;
-            }
-        };
+//        var grid = new GridCell[height][width];
+//        Arrays.stream(grid).forEach(row -> Arrays.fill(row, GridCell.OCEAN));
+        var creatures = new HashMap<World.Position, Creature>();
 
         for (int i = 0; i < fishCount; i++) {
-            spawnFish.run();
+            while (true) {
+                int row = random.nextInt(height);
+                int col = random.nextInt(width);
+//                if (grid[row][col] != GridCell.OCEAN) {
+//                    continue;
+//                }
+                if (creatures.get(new World.Position(row, col)) != null) {
+                    continue;
+                }
+
+//                grid[row][col] = GridCell.FISH;
+                var pos = new World.Position(row, col);
+                creatures.put(pos, new Fish(random, pos));
+                break;
+            }
         }
 
         for (int i = 0; i < sharkCount; i++) {
-            spawnShark.run();
+            while (true) {
+                int row = random.nextInt(height);
+                int col = random.nextInt(width);
+                if (creatures.get(new World.Position(row, col)) != null) {
+                    continue;
+                }
+
+//                grid[row][col] = GridCell.SHARK;
+                var pos = new World.Position(row, col);
+                creatures.put(pos, new Shark(random, pos));
+                break;
+            }
         }
 
-        return new State(grid, creatures, fishCount, sharkCount);
+        return new State(height, width, creatures, fishCount, sharkCount);
     }
 
-    private final GridCell[][] grid;
-    private final List<Creature> creatures;
+    //    private final GridCell[][] grid;
+    private final Map<World.Position, Creature> creatures;
+    private final int height;
+    private final int width;
 
-    private State(GridCell[][] grid, List<Creature> creatures, int fishCount, int sharkCount) {
-        this.grid = grid;
+    private State(int height, int width, Map<World.Position, Creature> creatures, int fishCount, int sharkCount) {
+//        this.grid = grid;
+        this.height = height;
+        this.width = width;
         this.creatures = creatures;
     }
 //
@@ -131,16 +129,19 @@ public class State {
 //        return creatures;
 //    }
 
-    public List<Creature> creatures() {
+    public Map<World.Position, Creature> creatures() {
         return creatures;
     }
 
     public GridCell atPosition(World.Position position) {
-        return atPosition(position.row(), position.col());
-    }
-
-    public GridCell atPosition(int row, int col) {
-        return grid[row][col];
+        Creature creature = creatures.get(position);
+        if (creature instanceof Shark) {
+            return GridCell.SHARK;
+        }
+        if (creature instanceof Fish) {
+            return GridCell.FISH;
+        }
+        return GridCell.OCEAN;
     }
 
     public boolean isValidPosition(World.Position position) {
@@ -152,16 +153,21 @@ public class State {
         }
     }
 
-    public void setAtPosition(World.Position pos, GridCell cell) {
-        grid[pos.row()][pos.col()] = cell;
+    public void setAtPosition(World.Position pos, Creature creature) {
+//        grid[pos.row()][pos.col()] = cell;
+        if (creature == null) {
+            creatures.remove(pos);
+        } else {
+            creatures.put(pos, creature);
+        }
     }
 
     public int height() {
-        return grid.length;
+        return height;
     }
 
     public int width() {
-        return grid[0].length;
+        return width;
     }
 
     private void requireValidPosition(int row, int col) {
@@ -173,21 +179,21 @@ public class State {
         }
     }
 
-    @Override
-    public String toString() {
-        var result = new StringBuilder();
-        for (GridCell[] row : grid) {
-            for (GridCell cell : row) {
-                switch (cell) {
-                    case FISH -> result.append('F');
-                    case SHARK -> result.append('S');
-                    case OCEAN -> result.append('~');
-                }
-            }
-            result.append('\n');
-        }
-        return result.toString();
-    }
+//    @Override
+//    public String toString() {
+//        var result = new StringBuilder();
+//        for (GridCell[] row : grid) {
+//            for (GridCell cell : row) {
+//                switch (cell) {
+//                    case FISH -> result.append('F');
+//                    case SHARK -> result.append('S');
+//                    case OCEAN -> result.append('~');
+//                }
+//            }
+//            result.append('\n');
+//        }
+//        return result.toString();
+//    }
 
     public World.Position addPositions(World.Position a, World.Position b) {
         int newRow = (a.row() + b.row()) % height();
@@ -202,4 +208,17 @@ public class State {
 
         return new World.Position(newRow, newCol);
     }
+
+    public void addCreature(Creature creature) {
+        creatures.put(creature.position(), creature);
+    }
+
+    public void removeCreature(Creature creature) {
+        creatures.remove(creature.position());
+    }
+
+//    public void spawnNewCreatures() {
+//        newCreatures.forEach(c -> creatures.put(c.position(), c));
+//        newCreatures.clear();
+//    }
 }

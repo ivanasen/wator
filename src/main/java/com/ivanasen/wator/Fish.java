@@ -11,7 +11,8 @@ public class Fish extends Creature {
     @Override
     public void updateState(State state) {
         if (state.atPosition(position) == State.GridCell.SHARK) {
-            state.creatures().remove(this);
+//            dead = true;
+//            state.removeCreature(this);
             return;
         }
 
@@ -20,16 +21,18 @@ public class Fish extends Creature {
         List<World.Position> possibleTransitions = findEmptyCells(state);
         if (possibleTransitions.size() > 0) {
             newPosition = possibleTransitions.get(random.nextInt(possibleTransitions.size()));
-            state.setAtPosition(newPosition, State.GridCell.FISH);
+            state.setAtPosition(newPosition, this);
         }
 
         libido++;
-        if (libido >= MAX_LIBIDO && !position.equals(newPosition)) {
-            libido = 0;
-            var child = new Fish(random, position);
-            state.creatures().add(child);
-        } else {
-            state.setAtPosition(position, State.GridCell.OCEAN);
+        if (!position.equals(newPosition)) {
+            if (libido >= MAX_LIBIDO) {
+                libido = 0;
+                var child = new Fish(random, position);
+                state.addCreature(child);
+            } else {
+                state.setAtPosition(position, null);
+            }
         }
 
         position = newPosition;

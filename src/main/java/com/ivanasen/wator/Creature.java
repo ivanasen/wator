@@ -12,6 +12,7 @@ public abstract class Creature {
     protected Random random;
     protected int energy;
     protected int libido;
+    protected boolean dead;
 
     public Creature(Random random, World.Position position, int energy, int libido) {
         this.random = random;
@@ -31,5 +32,13 @@ public abstract class Creature {
                 .map(tr -> state.addPositions(position, tr))
                 .filter(p -> state.atPosition(p) == State.GridCell.OCEAN)
                 .collect(Collectors.toList());
+    }
+
+    public World.Position position() {
+        return position;
+    }
+
+    public boolean isDead() {
+        return dead;
     }
 }

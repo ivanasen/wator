@@ -1,7 +1,10 @@
 package com.ivanasen.wator;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class World {
     public static record Position(int row, int col) {
@@ -25,10 +28,20 @@ public class World {
             return;
         }
 
-        var creatures = new ArrayList<>(state.creatures());
-        for (Creature creature : creatures) {
+        Map<Position, Creature> creatures = new HashMap<>(state.creatures());
+        creatures.forEach((position, creature) -> {
             creature.updateState(state);
-        }
+        });
+//        Iterator<Map.Entry<Position, Creature>> iterator = state.creatures().entrySet().iterator();
+//        while (iterator.hasNext()) {
+//            Map.Entry<Position, Creature> item = iterator.next();
+//            item.getValue().updateState(state);
+//            if (item.getValue().isDead()) {
+//                iterator.remove();
+//                state.setAtPosition(item.getValue().position(), State.GridCell.OCEAN);
+//            }
+//        }
+//        state.spawnNewCreatures();
     }
 
     public State getState() {
