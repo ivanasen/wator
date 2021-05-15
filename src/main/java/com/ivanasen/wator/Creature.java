@@ -5,27 +5,22 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public abstract class Creature {
-    protected static final int MAX_LIBIDO = 12;
+    protected static final int MAX_AGE = 12;
     protected static final int MIN_ENERGY = 0;
 
     protected World.Position position;
     protected Random random;
     protected int energy;
-    protected int libido;
-    protected boolean dead;
+    protected int age;
 
-    public Creature(Random random, World.Position position, int energy, int libido) {
+    public Creature(Random random, World.Position position, int energy, int age) {
         this.random = random;
         this.position = position;
         this.energy = energy;
-        this.libido = libido;
+        this.age = age;
     }
 
     public abstract void updateState(State state);
-
-    public void setRandom(Random random) {
-        this.random = random;
-    }
 
     protected List<World.Position> findEmptyCells(State state) {
         return World.VALID_TRANSITIONS.stream()
@@ -38,7 +33,7 @@ public abstract class Creature {
         return position;
     }
 
-    public boolean isDead() {
-        return dead;
+    public int age() {
+        return age;
     }
 }

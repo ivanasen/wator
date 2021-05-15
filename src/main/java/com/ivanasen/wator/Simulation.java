@@ -60,32 +60,22 @@ public class Simulation extends JPanel {
         for (int i = 0; i < state.height(); i++) {
             for (int j = 0; j < state.width(); j++) {
                 var pos = new World.Position(i, j);
-                paintCell(g, state, state.atPosition(pos), pos);
+                paintCell(g, state.creatures().get(pos), pos);
             }
         }
     }
 
-    private void paintCell(Graphics g, State state, State.GridCell cell, World.Position position) {
-        Color color = null;
-        switch (cell) {
-            case FISH -> color = FISH_COLOR;
-            case SHARK -> {
-//                Shark creature = (Shark) state.creatures().get(position);
-//                if (creature == null) {
-//                    color = OCEAN_COLOR;
-//                } else if (creature.debug) {
-//                    color = Color.BLUE;
-//                } else {
-//                    color = SHARK_COLOR;
-//                }
-                color = SHARK_COLOR;
-            }
-            case OCEAN -> color = OCEAN_COLOR;
+    private void paintCell(Graphics g, Creature creature, World.Position position) {
+        var color = OCEAN_COLOR;
+        if (creature instanceof Fish) {
+            color = FISH_COLOR;
+        } else if (creature instanceof Shark) {
+            color = SHARK_COLOR;
         }
         g.setColor(color);
 
-        int y = position.row() * CELL_SIZE;
         int x = position.col() * CELL_SIZE;
+        int y = position.row() * CELL_SIZE;
         g.fillRect(x, y, CELL_SIZE, CELL_SIZE);
     }
 }

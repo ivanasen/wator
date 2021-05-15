@@ -14,8 +14,6 @@ public class Shark extends Creature {
     @Override
     public void updateState(State state) {
         if (energy <= MIN_ENERGY) {
-//            state.setAtPosition(position, null);
-//            dead = true;
             state.removeCreature(this);
             return;
         }
@@ -38,10 +36,10 @@ public class Shark extends Creature {
         this.debug = newPosition.equals(position);
         state.setAtPosition(newPosition, this);
 
-        libido++;
+        age++;
         if (!position.equals(newPosition)) {
-            if (libido >= MAX_LIBIDO) {
-                libido = 0;
+            if (age >= MAX_AGE) {
+                age = 0;
                 var child = new Shark(random, position);
                 state.addCreature(child);
             } else {
