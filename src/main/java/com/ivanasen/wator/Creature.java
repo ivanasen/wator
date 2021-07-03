@@ -9,6 +9,7 @@ public abstract class Creature {
     protected static final int MIN_ENERGY = 0;
 
     protected World.Position position;
+    protected int index;
     protected Random random;
     protected int energy;
     protected int age;
@@ -25,7 +26,7 @@ public abstract class Creature {
     protected List<World.Position> findEmptyCells(State state) {
         return World.VALID_TRANSITIONS.stream()
                 .map(tr -> state.addPositions(position, tr))
-                .filter(p -> state.atPosition(p) == State.GridCell.OCEAN)
+                .filter(p -> state.atPosition(p) == null)
                 .collect(Collectors.toList());
     }
 
@@ -35,5 +36,9 @@ public abstract class Creature {
 
     public int age() {
         return age;
+    }
+
+    public int index() {
+        return index;
     }
 }

@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.Random;
 import javax.swing.*;
 
-public class Simulation extends JPanel {
+public class GuiSimulation extends JPanel {
     private static final Color OCEAN_COLOR = new Color(33, 33, 33);
     private static final Color FISH_COLOR = new Color(102, 187, 106);
     private static final Color SHARK_COLOR = new Color(33, 150, 243);
@@ -18,7 +18,7 @@ public class Simulation extends JPanel {
     public static void main(String[] args) {
         var frame = new JFrame("Wa-Tor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new Simulation());
+        frame.add(new GuiSimulation());
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -26,22 +26,16 @@ public class Simulation extends JPanel {
 
     private final World world;
 
-    public Simulation() {
-        var random = new Random();
+    public GuiSimulation() {
+        var random = new Random(0);
         var initialState = State.random(WORLD_HEIGHT, WORLD_WIDTH, FISH_COUNT, SHARK_COUNT, random);
         world = new World(initialState);
 
         var timer = new Timer(FRAME_INTERVAL_MILLIS, e -> {
-            updateState();
+            world.updateState();
             repaint();
         });
         timer.start();
-    }
-
-    private void updateState() {
-        if (world.hasNextState()) {
-            world.updateState();
-        }
     }
 
     @Override
@@ -55,12 +49,12 @@ public class Simulation extends JPanel {
         g.setColor(OCEAN_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-
         State state = world.getState();
+        var pos = new World.Position(0, 0);
         for (int i = 0; i < state.height(); i++) {
             for (int j = 0; j < state.width(); j++) {
-                var pos = new World.Position(i, j);
-                paintCell(g, state.creatures().get(pos), pos);
+                pos.set(i, j);
+                paintCell(g, state.atPosition(pos), pos);
             }
         }
     }
@@ -74,8 +68,8 @@ public class Simulation extends JPanel {
         }
         g.setColor(color);
 
-        int x = position.col() * CELL_SIZE;
-        int y = position.row() * CELL_SIZE;
+        int x = position.col * CELL_SIZE;
+        int y = position.row * CELL_SIZE;
         g.fillRect(x, y, CELL_SIZE, CELL_SIZE);
     }
 }

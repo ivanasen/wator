@@ -14,7 +14,7 @@ public class Shark extends Creature {
     @Override
     public void updateState(State state) {
         if (energy <= MIN_ENERGY) {
-            state.removeCreature(this);
+            state.removeAtPosition(position);
             return;
         }
 
@@ -34,16 +34,14 @@ public class Shark extends Creature {
         }
 
         this.debug = newPosition.equals(position);
-        state.setAtPosition(newPosition, this);
+        state.moveToPosition(newPosition, this);
 
         age++;
         if (!position.equals(newPosition)) {
             if (age >= MAX_AGE) {
                 age = 0;
                 var child = new Shark(random, position);
-                state.addCreature(child);
-            } else {
-                state.setAtPosition(position, null);
+                state.setAtPosition(child.position(), child);
             }
         }
 
@@ -53,7 +51,7 @@ public class Shark extends Creature {
     private List<World.Position> findCellsWithFish(State state) {
         return World.VALID_TRANSITIONS.stream()
                 .map(tr -> state.addPositions(position, tr))
-                .filter(p -> state.atPosition(p) == State.GridCell.FISH)
+                .filter(p -> state.atPosition(p) instanceof Fish)
                 .collect(Collectors.toList());
     }
 }
