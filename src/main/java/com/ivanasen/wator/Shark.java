@@ -6,13 +6,13 @@ import java.util.stream.Collectors;
 
 public class Shark extends Creature {
 
-    public Shark(Random random, World.Position position) {
-        super(random, position, 11, 0);
+    public Shark(World.Position position) {
+        super(position, 11, 0);
     }
 
     @Override
-    public void updateState(State state) {
-        if (energy <= MIN_ENERGY) {
+    public void updateState(State state, Random random) {
+        if (energy <= Constants.MIN_ENERGY) {
             state.removeAtPosition(position);
             return;
         }
@@ -36,10 +36,10 @@ public class Shark extends Creature {
 
         age++;
         if (!position.equals(newPosition)) {
-            if (age >= MAX_AGE) {
+            if (age >= Constants.SHARK_MAX_AGE) {
                 age = 0;
-                var child = new Shark(random, position);
-                state.setAtPosition(child.position(), child);
+                var child = new Shark(position);
+                state.addCreature(child.position(), child);
             }
         }
 

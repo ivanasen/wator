@@ -12,5 +12,9 @@ public class Constants {
     public static final int FISH_COUNT = 50000;
     public static final int SHARK_COUNT = 5000;
     public static final int FRAME_INTERVAL_MILLIS = 20;
-    public static final int NUM_ITERATIONS = 1000;
+    public static final int NUM_ITERATIONS = 100;
+    public static final int NUM_THREADS = 4;
+    public static final int FISH_MAX_AGE = 12;
+    public static final int SHARK_MAX_AGE = 12;
+    public static final int MIN_ENERGY = 0;
 }

@@ -5,23 +5,18 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public abstract class Creature {
-    protected static final int MAX_AGE = 12;
-    protected static final int MIN_ENERGY = 0;
-
     protected World.Position position;
     protected int index;
-    protected Random random;
     protected int energy;
     protected int age;
 
-    public Creature(Random random, World.Position position, int energy, int age) {
-        this.random = random;
+    public Creature(World.Position position, int energy, int age) {
         this.position = position;
         this.energy = energy;
         this.age = age;
     }
 
-    public abstract void updateState(State state);
+    public abstract void updateState(State state, Random random);
 
     protected List<World.Position> findEmptyCells(State state) {
         return World.VALID_TRANSITIONS.stream()

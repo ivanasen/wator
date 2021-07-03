@@ -17,15 +17,11 @@ public class GuiSimulation extends JPanel {
     private final World world;
 
     public GuiSimulation() {
-        var random = new Random(0);
-        var initialState = State.random(Constants.WORLD_HEIGHT, Constants.WORLD_WIDTH, Constants.FISH_COUNT, Constants.SHARK_COUNT, random);
-        world = new World(initialState);
+        var initialState = State.random(Constants.WORLD_HEIGHT, Constants.WORLD_WIDTH, Constants.FISH_COUNT, Constants.SHARK_COUNT);
+        world = new ParallelWorld(initialState, Constants.NUM_THREADS, Constants.FRAME_INTERVAL_MILLIS);
 
-        var timer = new Timer(Constants.FRAME_INTERVAL_MILLIS, e -> {
-            world.updateState();
-            repaint();
-        });
-        timer.start();
+        new Timer(Constants.FRAME_INTERVAL_MILLIS, e -> repaint()).start();
+        new Thread(() -> world.updateState(World.UPDATE_FOREVER)).start();
     }
 
     @Override

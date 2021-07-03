@@ -2,6 +2,7 @@ package com.ivanasen.wator;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class World {
     public static class Position {
@@ -43,13 +44,31 @@ public class World {
             new World.Position(0, 1)   // West
     );
 
-    private final State state;
+    public static final long UPDATE_FOREVER = Long.MAX_VALUE;
 
-    public World(State initialState) {
+    protected final State state;
+    private final Random random;
+    protected final int sleepBetweenIterations;
+
+    public World(State initialState, Random random, int sleepBetweenIterations) {
         state = initialState;
+        this.random = random;
+        this.sleepBetweenIterations = sleepBetweenIterations;
     }
 
-    public void updateState() {
+    public void updateState(long iterations) {
+        // If (iterations == UPDATE_FOREVER) this will run forever as int will overflow
+        for (int i = 0; i < iterations; i++) {
+            updateSingleIteration();
+            try {
+                Thread.sleep(sleepBetweenIterations);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateSingleIteration() {
         if (!hasNextState()) {
             return;
         }
@@ -58,7 +77,7 @@ public class World {
         for (int i = 0; i < creatures.size(); i++) {
             List<Creature> row = creatures.get(i);
             for (int j = 0; j < row.size(); j++) {
-                row.get(j).updateState(state);
+                row.get(j).updateState(state, random);
             }
         }
     }

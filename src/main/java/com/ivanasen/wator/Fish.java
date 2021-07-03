@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Random;
 
 public class Fish extends Creature {
-    public Fish(Random random, World.Position position) {
-        super(random, position, -1, 0);
+    public Fish(World.Position position) {
+        super(position, -1, 0);
     }
 
     @Override
-    public void updateState(State state) {
+    public void updateState(State state, Random random) {
         if (state.atPosition(position) instanceof Shark) {
             return;
         }
@@ -24,10 +24,10 @@ public class Fish extends Creature {
 
         age++;
         if (!position.equals(newPosition)) {
-            if (age >= MAX_AGE) {
+            if (age >= Constants.FISH_MAX_AGE) {
                 age = 0;
-                var child = new Fish(random, position);
-                state.setAtPosition(child.position(), child);
+                var child = new Fish(position);
+                state.addCreature(child.position(), child);
             }
         }
 
