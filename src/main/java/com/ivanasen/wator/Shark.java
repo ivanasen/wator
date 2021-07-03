@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Shark extends Creature {
-    public boolean debug;
 
     public Shark(Random random, World.Position position) {
         super(random, position, 11, 0);
@@ -33,7 +32,6 @@ public class Shark extends Creature {
             newPosition = possibleTransitions.get(random.nextInt(possibleTransitions.size()));
         }
 
-        this.debug = newPosition.equals(position);
         state.moveToPosition(newPosition, this);
 
         age++;

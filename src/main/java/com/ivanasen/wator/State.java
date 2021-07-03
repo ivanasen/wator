@@ -1,6 +1,9 @@
 package com.ivanasen.wator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class State {
     public static State empty(int height, int width) {
@@ -84,15 +87,17 @@ public class State {
         }
 
         grid[pos.row][pos.col] = null;
+
         List<Creature> row = creatures.get(pos.row);
         Creature last = row.get(row.size() - 1);
         last.index = creature.index;
+
+        // Remove from list in constant time by "swapping" with last element
         row.set(creature.index, last);
         row.remove(row.size() - 1);
     }
 
     public void setAtPosition(World.Position pos, Creature creature) {
-        System.out.println(creature.position.row + ":" + creature.position.col + ":" + creature.index);
         Creature oldCreature = grid[pos.row][pos.col];
         if (oldCreature != null) {
             removeAtPosition(pos);
