@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public record ParallelWorker(
+public record Worker(
         State state, int index, int size, int nThreads, long totalIterations, int sleepBetweenIterations)
         implements Runnable {
     @Override

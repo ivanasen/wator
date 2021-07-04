@@ -1,11 +1,11 @@
 package com.ivanasen.wator;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-public class World {
+public record World(State state, int nThreads, int sleepBetweenIterations) {
     public static final List<Position> VALID_TRANSITIONS = List.of(
             new Position(-1, 0), // North
             new Position(1, 0),  // South
@@ -15,45 +15,26 @@ public class World {
 
     public static final long UPDATE_FOREVER = Long.MAX_VALUE;
 
-    protected final State state;
-    private final Random random;
-    protected final int sleepBetweenIterations;
-
-    public World(State initialState, Random random, int sleepBetweenIterations) {
-        state = initialState;
-        this.random = random;
-        this.sleepBetweenIterations = sleepBetweenIterations;
-    }
-
     public void updateState(long iterations) {
-        // If (iterations == UPDATE_FOREVER) this will run forever as int will overflow
-        for (int i = 0; i < iterations; i++) {
-            updateSingleIteration();
-            try {
-                Thread.sleep(sleepBetweenIterations);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
+        int size = state.height() / nThreads;
+
+        for (int i = 0; i < nThreads; i++) {
+            var worker = new Worker(state, i, size, nThreads, iterations, sleepBetweenIterations);
+            executorService.submit(worker);
+        }
+        awaitTerminationAfterShutdown(executorService);
+    }
+
+    private void awaitTerminationAfterShutdown(ExecutorService executorService) {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(1, TimeUnit.HOURS)) {
+                executorService.shutdownNow();
             }
+        } catch (InterruptedException ex) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
         }
-    }
-
-    private void updateSingleIteration() {
-        if (!hasNextState()) {
-            return;
-        }
-
-        List<Map<Position, Creature>> creatures = state.creatures();
-        for (Map<Position, Creature> row : creatures) {
-            var rowCopy = new HashMap<>(row);
-            rowCopy.forEach((k, v) -> v.updateState(state, random));
-        }
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public boolean hasNextState() {
-        return !state.creatures().isEmpty();
     }
 }

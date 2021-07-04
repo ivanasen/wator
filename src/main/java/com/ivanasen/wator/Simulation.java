@@ -40,7 +40,7 @@ public class Simulation {
                 nThreads, iterations, sharks, fish, height, width);
 
         var initialState = State.random(height, width, fish, sharks);
-        var world = new ParallelWorld(initialState, nThreads, 0);
+        var world = new World(initialState, nThreads, 0);
 
         long startTime = System.nanoTime();
 

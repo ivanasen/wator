@@ -17,7 +17,7 @@ public class GuiSimulation extends JPanel {
 
     public GuiSimulation() {
         var initialState = State.random(Constants.WORLD_HEIGHT, Constants.WORLD_WIDTH, Constants.FISH_COUNT, Constants.SHARK_COUNT);
-        world = new ParallelWorld(initialState, Constants.NUM_THREADS, Constants.FRAME_INTERVAL_MILLIS);
+        world = new World(initialState, Constants.NUM_THREADS, Constants.FRAME_INTERVAL_MILLIS);
 
         new Timer(Constants.FRAME_INTERVAL_MILLIS, e -> repaint()).start();
         new Thread(() -> world.updateState(World.UPDATE_FOREVER)).start();
@@ -34,7 +34,7 @@ public class GuiSimulation extends JPanel {
         g.setColor(Constants.OCEAN_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        State state = world.getState();
+        State state = world.state();
         var pos = new Position(0, 0);
         for (int i = 0; i < state.height(); i++) {
             for (int j = 0; j < state.width(); j++) {
