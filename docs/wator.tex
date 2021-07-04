@@ -57,16 +57,16 @@ Celular automata ~\cite{celular_automata}.
 Решението е имплементирано на Java 16 и използва вградени способности за паралелно програмиране,
 част от Java SE.
 \begin{itemize}
-	\item java.lang.Thread: основният начин за създаване на нишки във Java
-	\item java.util.concurrent.ExecutorService
-	\item java.util.concurrent.locks.ReentrantLock
+	\item java.lang.thread: основният начин за създаване на нишки във java
+	\item java.util.concurrent.executorservice
+	\item java.util.concurrent.locks.reentrantlock
 \end{itemize}
 
 Архитектурата използва статична декомпозиция на домейна и е по модела Master-Slaves.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=1.1\textwidth]{classes-uml.png}
+	\includegraphics[width=1.2\textwidth]{classes-uml.png}
 	\caption{UML Клас диаграма на проекта}
 	\label{fig:figure1}
 \end{figure}
@@ -74,7 +74,21 @@ Celular automata ~\cite{celular_automata}.
 \section{Тестови резултати}
 
 Характеристики на тестовата машина: 
-
+\begin{itemize}
+	\item Процесор: 2 x Intel® Xeon® CPU E5-2660 0 @ 2.20GHz - Всеки процесор е с по 8 ядра и 2 нишки,
+	това прави 16 ядра общо и 32 нишки.
+	\item Памет: 64Gb, 32K L1d и L1i кешове, 256K L2 кеш и 20480К L3 кеш
+\end{itemize}
+\\
+Взимайки в предвид броя на нишките на машината има смисъл да тестваме скалируемост с до 32 паралелно работещи процеса/нишки.
+\\
+\\
+Начинът по който са получени резултатите е следният. Пускаме симулацията да върви за $N$ итерации
+и засичаме времето от началото на работата на всички нишки до края на работата на последната.
+Правим отделни измервания от 1 до 32 нишки, като правим по 5 за всеки $K$ на брой нишки. След това
+смятаме минимума, максимума и средното аритметично на получените резултати.
+\\
+\\
 \begin{tabular}{ |p{3cm}||p{3cm}|p{3cm}|p{3cm}|  }
  \hline
  \multicolumn{4}{|c|}{Ускорение (MIN,AVG,MAX) при размер 4000x2000 и популация 1 000 000} \\
@@ -90,7 +104,7 @@ Celular automata ~\cite{celular_automata}.
  31 & 10.12 & 10.32 & 10.39 \\
  \hline
 \end{tabular}
-
+\\
 \begin{tikzpicture}
 \begin{axis}[
 	title={Време за изпълнение при размер на полето 4000x2000},
@@ -100,7 +114,7 @@ Celular automata ~\cite{celular_automata}.
 	ymajorgrids=true,
 	grid style=dashed,
 ]
-
+\\
 \addplot[
 	color=blue,
 	mark=square,

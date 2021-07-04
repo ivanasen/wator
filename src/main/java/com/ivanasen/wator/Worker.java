@@ -14,8 +14,13 @@ public record Worker(
             var random = new Random(index);
 
             // If (iterations == UPDATE_FOREVER) this will run forever as int will overflow
-            for (int it = 0; it < totalIterations; it++) {
+            for (int iteration = 0; iteration < totalIterations; iteration++) {
                 runSingleIteration(random);
+                try {
+                    Thread.sleep(sleepBetweenIterations);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -29,28 +34,22 @@ public record Worker(
             endRow = state.height() - 1;
         }
 
-        for (int j = startRow; j <= endRow; j++) {
-            if (j == startRow) {
+        for (int i = startRow; i <= endRow; i++) {
+            if (i == startRow) {
                 state.lockRow(startRow);
-            } else if (j == endRow) {
+            } else if (i == endRow) {
                 state.lockRow((endRow + 1) % state.height());
             }
 
             List<Map<Position, Creature>> creatures = state.creatures();
-            var row = new HashMap<>(creatures.get(j));
+            var row = new HashMap<>(creatures.get(i));
             row.forEach((k, v) -> v.updateState(state, random));
 
-            if (j == startRow) {
+            if (i == startRow) {
                 state.unlockRow(startRow);
-            } else if (j == endRow) {
+            } else if (i == endRow) {
                 state.unlockRow((endRow + 1) % state.height());
             }
-        }
-
-        try {
-            Thread.sleep(sleepBetweenIterations);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }
