@@ -1,7 +1,8 @@
 package com.ivanasen.wator;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Random;
 
 public class World {
@@ -33,7 +34,7 @@ public class World {
 
         @Override
         public int hashCode() {
-            return Objects.hash(row, col);
+            return col;
         }
     }
 
@@ -73,12 +74,10 @@ public class World {
             return;
         }
 
-        List<List<Creature>> creatures = state.creatures();
-        for (int i = 0; i < creatures.size(); i++) {
-            List<Creature> row = creatures.get(i);
-            for (int j = 0; j < row.size(); j++) {
-                row.get(j).updateState(state, random);
-            }
+        List<Map<Position, Creature>> creatures = state.creatures();
+        for (Map<Position, Creature> row : creatures) {
+            var rowCopy = new HashMap<>(row);
+            rowCopy.forEach((k, v) -> v.updateState(state, random));
         }
     }
 

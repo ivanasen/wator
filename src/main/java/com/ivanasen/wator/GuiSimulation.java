@@ -2,7 +2,6 @@ package com.ivanasen.wator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Random;
 
 public class GuiSimulation extends JPanel {
     public static void main(String[] args) {

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 public abstract class Creature {
     protected World.Position position;
-    protected int index;
     protected int energy;
     protected int age;
 
@@ -27,13 +26,5 @@ public abstract class Creature {
 
     public World.Position position() {
         return position;
-    }
-
-    public int age() {
-        return age;
-    }
-
-    public int index() {
-        return index;
     }
 }

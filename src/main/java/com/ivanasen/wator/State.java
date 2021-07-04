@@ -1,21 +1,24 @@
 package com.ivanasen.wator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class State {
+
     public static State empty(int height, int width) {
         if (height <= 0 || width <= 0) {
             throw new IllegalArgumentException("World size must be positive");
         }
 
-        var creatures = new ArrayList<List<Creature>>(height);
+        var creatures = new ArrayList<Map<World.Position, Creature>>(height);
         for (int row = 0; row < height; row++) {
-            creatures.add(row, new ArrayList<>());
+            creatures.add(row, new HashMap<>());
         }
         return new State(height, width, creatures);
     }
@@ -50,21 +53,19 @@ public class State {
     }
 
     private final Creature[][] grid;
-    private final List<List<Creature>> creatures;
+    private final List<Map<World.Position, Creature>> creatures;
     private final List<ReentrantLock> locks;
     private final int height;
     private final int width;
 
-    private State(int height, int width, List<List<Creature>> creatures) {
+    private State(int height, int width, List<Map<World.Position, Creature>> creatures) {
         this.height = height;
         this.width = width;
         this.creatures = creatures;
         this.grid = new Creature[height][width];
         this.locks = Stream.generate(ReentrantLock::new).limit(height).collect(Collectors.toList());
-        for (List<Creature> row : creatures) {
-            for (Creature c : row) {
-                grid[c.position().row][c.position().col] = c;
-            }
+        for (Map<World.Position, Creature> row : creatures) {
+            row.forEach((k, v) -> grid[k.row][k.col] = v);
         }
     }
 
@@ -76,7 +77,7 @@ public class State {
         locks.get(row).unlock();
     }
 
-    public List<List<Creature>> creatures() {
+    public List<Map<World.Position, Creature>> creatures() {
         return creatures;
     }
 
@@ -92,13 +93,8 @@ public class State {
 
         grid[pos.row][pos.col] = null;
 
-        List<Creature> row = creatures.get(pos.row);
-        Creature last = row.get(row.size() - 1);
-        last.index = creature.index;
-
-        // Remove from list in constant time by "swapping" with last element
-        row.set(creature.index, last);
-        row.remove(row.size() - 1);
+        Map<World.Position, Creature> row = creatures.get(pos.row);
+        row.remove(pos);
     }
 
     public void addCreature(World.Position pos, Creature creature) {
@@ -107,8 +103,7 @@ public class State {
             removeAtPosition(pos);
         }
 
-        creature.index = creatures.get(pos.row).size();
-        creatures.get(pos.row).add(creature);
+        creatures.get(pos.row).put(pos, creature);
         grid[pos.row][pos.col] = creature;
     }
 

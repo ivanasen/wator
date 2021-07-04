@@ -1,6 +1,8 @@
 package com.ivanasen.wator;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,47 +22,49 @@ public class ParallelWorld extends World {
         ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
         final int size = getState().height() / nThreads;
 
-        List<List<Creature>> creatures = state.creatures();
+        List<Map<Position, Creature>> creatures = state.creatures();
 
         for (int i = 0; i < nThreads; i++) {
             final int iFinal = i;
             executorService.submit(() -> {
-                var random = new Random(iFinal);
+                try {
+                    var random = new Random(iFinal);
 
-                int startRow = iFinal * size;
-                int endRow = startRow + size - 1;
-                if (iFinal == nThreads - 1) {
-                    endRow = state.height() - 1;
-                }
+                    int startRow = iFinal * size;
+                    int endRow = startRow + size - 1;
+                    if (iFinal == nThreads - 1) {
+                        endRow = state.height() - 1;
+                    }
 //                System.out.println(iFinal + " " + startRow + " " + endRow + " " + (endRow + 1) % state.height());
 
-                // If (iterations == UPDATE_FOREVER) this will run forever as int will overflow
-                for (int it = 0; it < iterations; it++) {
+                    // If (iterations == UPDATE_FOREVER) this will run forever as int will overflow
+                    for (int it = 0; it < iterations; it++) {
 //                    System.out.println("It: " + it + " thr: " + Thread.currentThread().getName());
-                    for (int j = startRow; j <= endRow; j++) {
-                        if (j == startRow) {
-                            state.lockRow(startRow);
-                        } else if (j == endRow) {
-                            state.lockRow((endRow + 1) % state.height());
+                        for (int j = startRow; j <= endRow; j++) {
+                            if (j == startRow) {
+                                state.lockRow(startRow);
+                            } else if (j == endRow) {
+                                state.lockRow((endRow + 1) % state.height());
+                            }
+
+                            var row = new HashMap<>(creatures.get(j));
+                            row.forEach((k, v) -> v.updateState(state, random));
+
+                            if (j == startRow) {
+                                state.unlockRow(startRow);
+                            } else if (j == endRow) {
+                                state.unlockRow((endRow + 1) % state.height());
+                            }
                         }
 
-                        List<Creature> row = creatures.get(j);
-                        for (int k = 0; k < row.size(); k++) {
-                            row.get(k).updateState(state, random);
-                        }
-
-                        if (j == startRow) {
-                            state.unlockRow(startRow);
-                        } else if (j == endRow) {
-                            state.unlockRow((endRow + 1) % state.height());
+                        try {
+                            Thread.sleep(sleepBetweenIterations);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
-
-                    try {
-                        Thread.sleep(sleepBetweenIterations);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         }
