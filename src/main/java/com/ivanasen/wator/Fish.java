@@ -5,13 +5,22 @@ import java.util.Random;
 
 public class Fish extends Creature {
     public Fish(Position position) {
-        super(position, -1, 0);
+        super(position, Constants.FISH_INITIAL_ENERGY, 0);
     }
 
     @Override
     public void updateState(State state, Random random) {
+        if (energy != Constants.ENERGY_IMMORTAL && energy <= Constants.MIN_ENERGY) {
+            state.removeAtPosition(position);
+            return;
+        }
+
         if (state.atPosition(position) instanceof Shark) {
             return;
+        }
+
+        if (energy != Constants.ENERGY_IMMORTAL) {
+            energy--;
         }
 
         Position newPosition = position;

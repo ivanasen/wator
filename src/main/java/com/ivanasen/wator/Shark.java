@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 public class Shark extends Creature {
 
     public Shark(Position position) {
-        super(position, 11, 0);
+        super(position, Constants.SHARK_INITIAL_ENERGY, 0);
     }
 
     @Override
     public void updateState(State state, Random random) {
-        if (energy <= Constants.MIN_ENERGY) {
+        if (energy != Constants.ENERGY_IMMORTAL && energy <= Constants.MIN_ENERGY) {
             state.removeAtPosition(position);
             return;
         }
