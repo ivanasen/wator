@@ -60,26 +60,35 @@ Celular automata ~\cite{celular_automata}.
 	\item java.util.concurrent.ExecutorService
 	\item java.util.concurrent.locks.ReentrantLock
 \end{itemize}
-Архитектурата е по модела Master-Slaves.
+
+Архитектурата използва статична декомпозиция на домейна и е по модела Master-Slaves.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.5\textwidth]{classes-uml.png}
+	\includegraphics[width=0.6\textwidth]{classes-uml.png}
 	\caption{UML Клас диаграма на проекта}
 	\label{fig:figure1}
 \end{figure}
-
-% \begin{figure}[h]
-% 	\includegraphics[scale=0.18]{screenshot-big.png}
-% 	\caption{Симулацията със размер на полето 1920x1080, 1 милион херинги и 10 хиляди акули}
-% 	\label{fig:figure2}
-% \end{figure}
 
 \section{Тестови резултати}
 
 
 \section{Бъдещо развитие на проекта}
 Използване на Dynamic domain decomposition
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{screenshot-big.png}
+	\caption{Симулацията със размер на полето 1920x1080, 1 000 000 херинги и 100 000 акули}
+	\label{fig:figure2}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{screenshot-small.png}
+	\caption{Симулацията със размер на полето 480x270, 10 000 херинги и 1000 хиляди акули}
+	\label{fig:figure3}
+\end{figure}
 
 \bibliography{wator}{}
 \bibliographystyle{plain}
