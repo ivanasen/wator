@@ -9,6 +9,11 @@ public abstract class Creature {
     protected int energy;
     protected int age;
 
+    public Creature prev;
+    public Creature next;
+
+    public boolean updated;
+
     public Creature(Position position, int energy, int age) {
         this.position = position;
         this.energy = energy;

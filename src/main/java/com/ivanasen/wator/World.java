@@ -38,22 +38,42 @@ public class World {
     }
 
     private void updateSingleIteration() {
-        if (!hasNextState()) {
-            return;
+//        if (!hasNextState()) {
+//            return;
+//        }
+
+//        List<Map<Position, Creature>> creatures = state.creatures();
+        Creature[] creatures = state.creatures();
+        for (Creature head : creatures) {
+            Creature current = head;
+            while (current != null) {
+                current.updated = false;
+                current = current.next;
+            }
         }
 
-        List<Map<Position, Creature>> creatures = state.creatures();
-        for (Map<Position, Creature> row : creatures) {
-            var rowCopy = new HashMap<>(row);
-            rowCopy.forEach((k, v) -> v.updateState(state, random));
+        for (Creature head : creatures) {
+            Creature current = head;
+            while (current != null) {
+                Creature next = current.next;
+                if (!current.updated) {
+                    current.updateState(state, random);
+                    current.updated = true;
+                }
+                current = next;
+            }
         }
+//        for (Map<Position, Creature> row : creatures) {
+//            var rowCopy = new HashMap<>(row);
+//            rowCopy.forEach((k, v) -> v.updateState(state, random));
+//        }
     }
 
     public State getState() {
         return state;
     }
 
-    public boolean hasNextState() {
-        return !state.creatures().isEmpty();
-    }
+//    public boolean hasNextState() {
+//        return !state.creatures().isEmpty();
+//    }
 }

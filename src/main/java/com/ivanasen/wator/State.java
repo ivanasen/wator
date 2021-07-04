@@ -16,11 +16,13 @@ public class State {
             throw new IllegalArgumentException("World size must be positive");
         }
 
-        var creatures = new ArrayList<Map<Position, Creature>>(height);
-        for (int row = 0; row < height; row++) {
-            creatures.add(row, new HashMap<>());
-        }
-        return new State(height, width, creatures);
+//        var creatures = new ArrayList<Map<Position, Creature>>(height);
+        var heads = new Creature[height];
+//        for (int row = 0; row < height; row++) {
+//            creatures.add(row, new HashMap<>());
+//        }
+//        return new State(height, width, creatures);
+        return new State(height, width, heads);
     }
 
     public static State random(int height, int width, int fishCount, int sharkCount) {
@@ -53,20 +55,31 @@ public class State {
     }
 
     private final Creature[][] grid;
-    private final List<Map<Position, Creature>> creatures;
+    private final Creature[] heads;
+    //    private final List<Map<Position, Creature>> creatures;
     private final List<ReentrantLock> locks;
     private final int height;
     private final int width;
 
-    private State(int height, int width, List<Map<Position, Creature>> creatures) {
+    private State(int height, int width, Creature[] heads) {
+//    private State(int height, int width, List<Map<Position, Creature>> creatures) {
         this.height = height;
         this.width = width;
-        this.creatures = creatures;
+//        this.creatures = creatures;
         this.grid = new Creature[height][width];
         this.locks = Stream.generate(ReentrantLock::new).limit(height).collect(Collectors.toList());
-        for (Map<Position, Creature> row : creatures) {
-            row.forEach((k, v) -> grid[k.row][k.col] = v);
+        this.heads = heads;
+        for (Creature head : heads) {
+            Creature current = head;
+            while (current != null) {
+                grid[current.position.row][current.position.col] = current;
+                current = current.next;
+            }
         }
+//        for (Map<Position, Creature> row : creatures) {
+//            row.forEach((k, v) -> grid[k.row][k.col] = v);
+//        }
+//        this.grid = grid;
     }
 
     public void lockRow(int row) {
@@ -77,8 +90,9 @@ public class State {
         locks.get(row).unlock();
     }
 
-    public List<Map<Position, Creature>> creatures() {
-        return creatures;
+    //    public List<Map<Position, Creature>> creatures() {
+    public Creature[] creatures() {
+        return heads;
     }
 
     public Creature atPosition(Position position) {
@@ -93,8 +107,19 @@ public class State {
 
         grid[pos.row][pos.col] = null;
 
-        Map<Position, Creature> row = creatures.get(pos.row);
-        row.remove(pos);
+        Creature prev = creature.prev;
+        Creature next = creature.next;
+        if (prev != null) {
+            prev.next = next;
+        }
+        if (next != null) {
+            next.prev = prev;
+        }
+        if (creature == heads[pos.row]) {
+            heads[pos.row] = next;
+        }
+//        Map<Position, Creature> row = creatures.get(pos.row);
+//        row.remove(pos);
     }
 
     public void addCreature(Position pos, Creature creature) {
@@ -103,8 +128,14 @@ public class State {
             removeAtPosition(pos);
         }
 
-        creatures.get(pos.row).put(pos, creature);
+//        creatures.get(pos.row).put(pos, creature);
         grid[pos.row][pos.col] = creature;
+        creature.prev = null;
+        creature.next = heads[pos.row];
+        if (heads[pos.row] != null) {
+            heads[pos.row].prev = creature;
+        }
+        heads[pos.row] = creature;
     }
 
     public void moveToPosition(Position pos, Creature creature) {
