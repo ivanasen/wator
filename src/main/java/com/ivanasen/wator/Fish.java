@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Fish extends Creature {
-    public Fish(World.Position position) {
+    public Fish(Position position) {
         super(position, -1, 0);
     }
 
@@ -14,9 +14,9 @@ public class Fish extends Creature {
             return;
         }
 
-        World.Position newPosition = position;
+        Position newPosition = position;
 
-        List<World.Position> possibleTransitions = findEmptyCells(state);
+        List<Position> possibleTransitions = findEmptyCells(state);
         if (possibleTransitions.size() > 0) {
             newPosition = possibleTransitions.get(random.nextInt(possibleTransitions.size()));
             state.moveToPosition(newPosition, this);

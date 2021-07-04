@@ -35,16 +35,17 @@ public class GuiSimulation extends JPanel {
         g.fillRect(0, 0, getWidth(), getHeight());
 
         State state = world.getState();
-        var pos = new World.Position(0, 0);
+        var pos = new Position(0, 0);
         for (int i = 0; i < state.height(); i++) {
             for (int j = 0; j < state.width(); j++) {
-                pos.set(i, j);
+                pos.row = i;
+                pos.col = j;
                 paintCell(g, state.atPosition(pos), pos);
             }
         }
     }
 
-    private void paintCell(Graphics g, Creature creature, World.Position position) {
+    private void paintCell(Graphics g, Creature creature, Position position) {
         var color = Constants.OCEAN_COLOR;
         if (creature instanceof Fish) {
             color = Constants.FISH_COLOR;

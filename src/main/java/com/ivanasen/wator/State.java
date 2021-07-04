@@ -16,7 +16,7 @@ public class State {
             throw new IllegalArgumentException("World size must be positive");
         }
 
-        var creatures = new ArrayList<Map<World.Position, Creature>>(height);
+        var creatures = new ArrayList<Map<Position, Creature>>(height);
         for (int row = 0; row < height; row++) {
             creatures.add(row, new HashMap<>());
         }
@@ -29,7 +29,7 @@ public class State {
 
         for (int i = 0; i < fishCount; i++) {
             while (true) {
-                var pos = new World.Position(random.nextInt(height), random.nextInt(width));
+                var pos = new Position(random.nextInt(height), random.nextInt(width));
                 if (state.atPosition(pos) != null) {
                     continue;
                 }
@@ -40,7 +40,7 @@ public class State {
 
         for (int i = 0; i < sharkCount; i++) {
             while (true) {
-                var pos = new World.Position(random.nextInt(height), random.nextInt(width));
+                var pos = new Position(random.nextInt(height), random.nextInt(width));
                 if (state.atPosition(pos) != null) {
                     continue;
                 }
@@ -53,18 +53,18 @@ public class State {
     }
 
     private final Creature[][] grid;
-    private final List<Map<World.Position, Creature>> creatures;
+    private final List<Map<Position, Creature>> creatures;
     private final List<ReentrantLock> locks;
     private final int height;
     private final int width;
 
-    private State(int height, int width, List<Map<World.Position, Creature>> creatures) {
+    private State(int height, int width, List<Map<Position, Creature>> creatures) {
         this.height = height;
         this.width = width;
         this.creatures = creatures;
         this.grid = new Creature[height][width];
         this.locks = Stream.generate(ReentrantLock::new).limit(height).collect(Collectors.toList());
-        for (Map<World.Position, Creature> row : creatures) {
+        for (Map<Position, Creature> row : creatures) {
             row.forEach((k, v) -> grid[k.row][k.col] = v);
         }
     }
@@ -77,15 +77,15 @@ public class State {
         locks.get(row).unlock();
     }
 
-    public List<Map<World.Position, Creature>> creatures() {
+    public List<Map<Position, Creature>> creatures() {
         return creatures;
     }
 
-    public Creature atPosition(World.Position position) {
+    public Creature atPosition(Position position) {
         return grid[position.row][position.col];
     }
 
-    public void removeAtPosition(World.Position pos) {
+    public void removeAtPosition(Position pos) {
         Creature creature = grid[pos.row][pos.col];
         if (creature == null) {
             return;
@@ -93,11 +93,11 @@ public class State {
 
         grid[pos.row][pos.col] = null;
 
-        Map<World.Position, Creature> row = creatures.get(pos.row);
+        Map<Position, Creature> row = creatures.get(pos.row);
         row.remove(pos);
     }
 
-    public void addCreature(World.Position pos, Creature creature) {
+    public void addCreature(Position pos, Creature creature) {
         Creature oldCreature = grid[pos.row][pos.col];
         if (oldCreature != null) {
             removeAtPosition(pos);
@@ -107,7 +107,7 @@ public class State {
         grid[pos.row][pos.col] = creature;
     }
 
-    public void moveToPosition(World.Position pos, Creature creature) {
+    public void moveToPosition(Position pos, Creature creature) {
         removeAtPosition(creature.position());
         addCreature(pos, creature);
     }
@@ -120,7 +120,7 @@ public class State {
         return width;
     }
 
-    public World.Position addPositions(World.Position a, World.Position b) {
+    public Position addPositions(Position a, Position b) {
         int newRow = (a.row + b.row) % height();
         if (newRow < 0) {
             newRow = height() + newRow;
@@ -131,6 +131,6 @@ public class State {
             newCol = width() + newCol;
         }
 
-        return new World.Position(newRow, newCol);
+        return new Position(newRow, newCol);
     }
 }

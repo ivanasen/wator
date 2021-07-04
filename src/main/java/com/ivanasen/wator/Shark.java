@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Shark extends Creature {
 
-    public Shark(World.Position position) {
+    public Shark(Position position) {
         super(position, 11, 0);
     }
 
@@ -17,9 +17,9 @@ public class Shark extends Creature {
             return;
         }
 
-        World.Position newPosition = position;
+        Position newPosition = position;
 
-        List<World.Position> possibleTransitions = findCellsWithFish(state);
+        List<Position> possibleTransitions = findCellsWithFish(state);
         if (possibleTransitions.isEmpty()) {
             possibleTransitions = findEmptyCells(state);
             energy--;
@@ -46,7 +46,7 @@ public class Shark extends Creature {
         position = newPosition;
     }
 
-    private List<World.Position> findCellsWithFish(State state) {
+    private List<Position> findCellsWithFish(State state) {
         return World.VALID_TRANSITIONS.stream()
                 .map(tr -> state.addPositions(position, tr))
                 .filter(p -> state.atPosition(p) instanceof Fish)
