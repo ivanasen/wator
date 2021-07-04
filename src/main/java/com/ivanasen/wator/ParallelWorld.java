@@ -22,7 +22,7 @@ public class ParallelWorld extends World {
         ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
         final int size = getState().height() / nThreads;
 
-        List<Map<Position, Creature>> creatures = state.creatures();
+        Creature[][] creatures = state.creatures();
 
         for (int i = 0; i < nThreads; i++) {
             final int iFinal = i;
@@ -47,8 +47,9 @@ public class ParallelWorld extends World {
                                 state.lockRow((endRow + 1) % state.height());
                             }
 
-                            var row = new HashMap<>(creatures.get(j));
-                            row.forEach((k, v) -> v.updateState(state, random));
+                            for (Creature c : creatures[j]) {
+                                c.updateState(state, random);
+                            }
 
                             if (j == startRow) {
                                 state.unlockRow(startRow);

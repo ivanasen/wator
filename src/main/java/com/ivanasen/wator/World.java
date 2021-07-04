@@ -1,8 +1,6 @@
 package com.ivanasen.wator;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class World {
@@ -38,22 +36,15 @@ public class World {
     }
 
     private void updateSingleIteration() {
-        if (!hasNextState()) {
-            return;
-        }
-
-        List<Map<Position, Creature>> creatures = state.creatures();
-        for (Map<Position, Creature> row : creatures) {
-            var rowCopy = new HashMap<>(row);
-            rowCopy.forEach((k, v) -> v.updateState(state, random));
+        Creature[][] creatures = state.creatures();
+        for (Creature[] row : creatures) {
+            for (Creature c : row) {
+                c.updateState(state, random);
+            }
         }
     }
 
     public State getState() {
         return state;
-    }
-
-    public boolean hasNextState() {
-        return !state.creatures().isEmpty();
     }
 }
