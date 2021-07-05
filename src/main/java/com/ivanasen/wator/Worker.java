@@ -35,10 +35,12 @@ public record Worker(
         }
 
         for (int i = startRow; i <= endRow; i++) {
+            int nextRow = (endRow + 1) % state.height();
             if (i == startRow) {
                 state.lockRow(startRow);
             } else if (i == endRow) {
-                state.lockRow((endRow + 1) % state.height());
+                state.waitForUpdate(nextRow);
+                state.lockRow(nextRow);
             }
 
             List<Map<Position, Creature>> creatures = state.creatures();
@@ -47,8 +49,9 @@ public record Worker(
 
             if (i == startRow) {
                 state.unlockRow(startRow);
+                state.signalUpdated(startRow);
             } else if (i == endRow) {
-                state.unlockRow((endRow + 1) % state.height());
+                state.unlockRow(nextRow);
             }
         }
     }

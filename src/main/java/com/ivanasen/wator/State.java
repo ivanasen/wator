@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class State {
@@ -54,7 +54,8 @@ public class State {
 
     private final Creature[][] grid;
     private final List<Map<Position, Creature>> creatures;
-    private final List<ReentrantLock> locks;
+    private final ReentrantLock[] rowLocks;
+    private final Semaphore[] isRowUpdated;
     private final int height;
     private final int width;
 
@@ -63,18 +64,29 @@ public class State {
         this.width = width;
         this.creatures = creatures;
         this.grid = new Creature[height][width];
-        this.locks = Stream.generate(ReentrantLock::new).limit(height).collect(Collectors.toList());
-        for (Map<Position, Creature> row : creatures) {
-            row.forEach((k, v) -> grid[k.row][k.col] = v);
-        }
+        this.rowLocks = Stream.generate(ReentrantLock::new).limit(height).toArray(ReentrantLock[]::new);
+        this.isRowUpdated = Stream.generate(() -> new Semaphore(0)).limit(height).toArray(Semaphore[]::new);
+        creatures.forEach(row -> row.forEach((k, v) -> grid[k.row][k.col] = v));
     }
 
     public void lockRow(int row) {
-        locks.get(row).lock();
+        rowLocks[row].lock();
     }
 
     public void unlockRow(int row) {
-        locks.get(row).unlock();
+        rowLocks[row].unlock();
+    }
+
+    public void waitForUpdate(int row) {
+        try {
+            isRowUpdated[row].acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void signalUpdated(int row) {
+        isRowUpdated[row].release();
     }
 
     public List<Map<Position, Creature>> creatures() {
